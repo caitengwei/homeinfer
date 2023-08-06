@@ -23,10 +23,9 @@ else()
     message(STATUS "Found gRPC++: ${GRPCPP_LINK_LIBRARIES} (found version \"${GRPCPP_VERSION}\")")
 endif()
 
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/cpp)
-
-set(PROTO_DIR ${CMAKE_SOURCE_DIR}/cpp/server/grpc/proto)
-set(PROTO_GENERATE_DIR ${CMAKE_SOURCE_DIR}/cpp/server/grpc/generated)
+set(SRC_DIR ${CMAKE_SOURCE_DIR})
+set(PROTO_DIR ${CMAKE_SOURCE_DIR}/server/grpc/proto)
+set(PROTO_GENERATE_DIR ${CMAKE_SOURCE_DIR}/server/grpc/generated)
 
 # Proto file
 get_filename_component(infer_proto "${PROTO_DIR}/inference.proto" ABSOLUTE)
@@ -41,16 +40,22 @@ set(GRPC_HDRS "${PROTO_GENERATE_DIR}/${infer_proto_name}.grpc.pb.h")
 add_custom_command(
     OUTPUT "${PROTO_SRCS}" "${PROTO_HDRS}" "${GRPC_SRCS}" "${GRPC_HDRS}"
     COMMAND ${Protobuf_PROTOC_EXECUTABLE}
-    ARGS --grpc_out "${SRC_DIR}/server/grpc"
-        --cpp_out "${SRC_DIR}/server/grpc"
+    ARGS --grpc_out "${SRC_DIR}/server/grpc/generated"
+        --cpp_out "${SRC_DIR}/server/grpc/generated"
         -I "${infer_proto_path}"
         --plugin=protoc-gen-grpc="${GRPCPP_PLUGIN_EXEC}"
         "${infer_proto}"
-    DEPENDS "${infer_proto}")\
+    DEPENDS "${infer_proto}"
+    COMMENT "Executing protoc to generate grpc files")
 
 
-# include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+add_executable(InferenceServer
+               ${SRC_DIR}/server/grpc/inference_server.cc
+               ${PROTO_SRCS}
+               ${GRPC_SRCS}
+)
 # add_executable(FileExchangeServer
 #                ${SRC_DIR}/server/main.cpp
 #                ${SRC_DIR}/server/Server.cpp
