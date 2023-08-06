@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project (homeinfer)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_options(-Wall -Werror)
@@ -49,6 +49,7 @@ add_custom_command(
     COMMENT "Executing protoc to generate grpc files")
 
 
+include_directories(${GRPCPP_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(InferenceServer
@@ -56,18 +57,7 @@ add_executable(InferenceServer
                ${PROTO_SRCS}
                ${GRPC_SRCS}
 )
-# add_executable(FileExchangeServer
-#                ${SRC_DIR}/server/main.cpp
-#                ${SRC_DIR}/server/Server.cpp
-#                ${SRC_DIR}/common/FileReader.cpp
-#                ${SRC_DIR}/common/FileWriter.cpp
-#                ${SRC_DIR}/common/FileManager.cpp
-#                ${SRC_DIR}/server/DownloadRequestHandler.cpp
-#                ${SRC_DIR}/server/UploadRequestHandler.cpp
-#                ${SRC_DIR}/common/RequestStatus.cpp
-#                ${PROTO_SRCS}
-#                ${GRPC_SRCS})
 # target_include_directories(FileExchangeServer PRIVATE ${SRC_DIR}/server ${SRC_DIR}/common)
-# target_link_libraries(FileExchangeServer
-#                       ${GRPCPP_LIBRARIES}
-#                       ${Protobuf_LIBRARIES})
+target_link_libraries(InferenceServer
+                      ${GRPCPP_LIBRARIES}
+                      ${Protobuf_LIBRARIES})
