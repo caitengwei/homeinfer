@@ -61,3 +61,5 @@ add_executable(InferenceServer
 target_link_libraries(InferenceServer
                       ${GRPCPP_LIBRARIES}
                       ${Protobuf_LIBRARIES})
+
+# FIXME: can't build on macos m2
